@@ -36,28 +36,6 @@ export const App: React.FC = () => {
     loadTodos();
   }, []);
 
-  // const onAdd = useCallback(async (value: string) => {
-  //   try {
-  //     if (value.trim() === '') {
-  //       throw new Error(ERROR.title);
-  //     }
-
-  //     const res = await addTodo({
-  //       title: value.trim(),
-  //       userId: USER_ID,
-  //       completed: false,
-  //     });
-
-  //     setTodosLoading(true)
-  //     return res;
-  //   } catch (err) {
-  //     setErrorMessage(err.message || ERROR.add);
-  //     throw new Error(ERROR.add);
-  //   } finally {
-  //     setTodosLoading(false);
-  //   }
-  // }, []);
-
   const filteredTodos = (qwery: FilterBy): Todo[] => {
     return todos.filter(item => {
       if (qwery === FilterBy.Active) {
