@@ -20,8 +20,6 @@ export const App: React.FC = () => {
   //   return <UserWarning />;
   // }
 
-  // console.log('render app');
-
   const loadTodos = useCallback(async () => {
     try {
       setErrorMessage(ERROR.default);
