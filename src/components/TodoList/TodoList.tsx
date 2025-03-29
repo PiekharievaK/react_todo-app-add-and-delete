@@ -5,15 +5,18 @@ import { ERROR } from '../../types/enums';
 
 type Props = {
   todos: Todo[];
-  setTodosLoading: (id: number | null) => void;
+  loading: {
+    adIdToLoadingList: (id: number) => void;
+    removeIdFromLoadingList: (id: number | null) => void;
+  };
   setErrorMessage: (value: ERROR) => void;
   setTodos: (callback: (prev: Todo[]) => Todo[]) => void;
-  todosLoading: number | null;
+  todosLoading: number[];
 };
 
 export const TodoList: React.FC<Props> = ({
   todos,
-  setTodosLoading,
+  loading,
   setErrorMessage,
   setTodos,
   todosLoading,
@@ -22,7 +25,7 @@ export const TodoList: React.FC<Props> = ({
 
   const onError = (message: ERROR) => {
     setErrorMessage(message);
-    setTodosLoading(null);
+    loading.removeIdFromLoadingList(null);
     throw new Error(message);
   };
 
@@ -32,7 +35,10 @@ export const TodoList: React.FC<Props> = ({
         <TodoItem
           todo={todo}
           key={todo.id}
-          setTodosLoading={setTodosLoading}
+          loading={{
+            adIdToLoadingList: loading.adIdToLoadingList,
+            removeIdFromLoadingList: loading.removeIdFromLoadingList,
+          }}
           onError={onError}
           setTodos={setTodos}
           isLoading={todosLoading}

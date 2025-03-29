@@ -14,7 +14,7 @@ export const App: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [filterQwery, setFilterQwery] = useState(FilterBy.All);
   const [errorMessage, setErrorMessage] = useState<ERROR>(ERROR.default);
-  const [todosLoading, setTodosLoading] = useState<number | null>(null);
+  const [todosLoading, setTodosLoading] = useState<number[]>([]);
 
   // if (!USER_ID) {
   //   return <UserWarning />;
@@ -34,6 +34,26 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     loadTodos();
+  }, []);
+
+  const adIdToLoadingList = useCallback((id: number) => {
+    setTodosLoading(prev => {
+      if (prev.length > 0) {
+        return [...prev, id];
+      }
+
+      return [id];
+    });
+  }, []);
+
+  const removeIdFromLoadingList = useCallback((id: number | null) => {
+    setTodosLoading(prev => {
+      if (prev.length > 1 && id !== null) {
+        return prev.filter(item => item !== id);
+      }
+
+      return [];
+    });
   }, []);
 
   const filteredTodos = (qwery: FilterBy): Todo[] => {
@@ -65,7 +85,7 @@ export const App: React.FC = () => {
         {todos.length > 0 && (
           <TodoList
             todos={visibleTodos}
-            setTodosLoading={setTodosLoading}
+            loading={{ adIdToLoadingList, removeIdFromLoadingList }}
             setErrorMessage={setErrorMessage}
             setTodos={setTodos}
             todosLoading={todosLoading}
@@ -77,7 +97,7 @@ export const App: React.FC = () => {
             todos={todos}
             filterQwery={filterQwery}
             setFilterQwery={setFilterQwery}
-            setTodosLoading={setTodosLoading}
+            loading={{ adIdToLoadingList, removeIdFromLoadingList }}
             setErrorMessage={setErrorMessage}
             setTodos={setTodos}
             todosLoading={todosLoading}

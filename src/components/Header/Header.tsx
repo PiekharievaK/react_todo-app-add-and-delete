@@ -5,9 +5,9 @@ import { Todo } from '../../types/Todo';
 
 type Props = {
   setErrorMessage: (value: ERROR) => void;
-  setTodosLoading: (id: number | null) => void;
+  setTodosLoading: (id: number[]) => void;
   setTodos: (callback: (prev: Todo[]) => Todo[]) => void;
-  todosLoading: number | null;
+  todosLoading: number[];
 };
 
 const HeaderComponent: React.FC<Props> = ({
@@ -21,7 +21,7 @@ const HeaderComponent: React.FC<Props> = ({
   // console.log('render header')
 
   useEffect(() => {
-    if (todosLoading !== null) {
+    if (todosLoading?.length < 0) {
       return;
     }
 
@@ -47,6 +47,7 @@ const HeaderComponent: React.FC<Props> = ({
           };
 
           setLoading(true);
+          setTodosLoading([id]);
 
           setTodos(prev => {
             id =
@@ -54,7 +55,7 @@ const HeaderComponent: React.FC<Props> = ({
                 ? Math.max(...prev.map((item: Todo) => item.id)) + 1
                 : 1;
 
-            setTodosLoading(id);
+            setTodosLoading([id]);
 
             return [...prev, { ...todo, id }];
           });
@@ -71,17 +72,14 @@ const HeaderComponent: React.FC<Props> = ({
             });
           });
 
-          inputField.current.value = '';
           inputField.current.focus();
-          setTodosLoading(id);
-
-          return res;
+          inputField.current.value = '';
         } catch (err) {
           setTodos(prev => prev.filter(item => id !== item.id));
           setErrorMessage(err.message || ERROR.add);
         } finally {
           setLoading(false);
-          setTodosLoading(null);
+          setTodosLoading([]);
         }
       }
     },

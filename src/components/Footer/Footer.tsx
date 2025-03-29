@@ -8,9 +8,12 @@ type Props = {
   filterQwery: FilterBy;
   setFilterQwery: (qwery: FilterBy) => void;
   setErrorMessage: (value: ERROR) => void;
-  setTodosLoading: (id: number | null) => void;
   setTodos: (callback: (prev: Todo[]) => Todo[]) => void;
-  todosLoading: number | null;
+  todosLoading: number[];
+  loading: {
+    adIdToLoadingList: (id: number) => void;
+    removeIdFromLoadingList: (id: number | null) => void;
+  };
 };
 
 const footerComponent: React.FC<Props> = ({
@@ -19,7 +22,7 @@ const footerComponent: React.FC<Props> = ({
   filterQwery,
   setFilterQwery,
   setErrorMessage,
-  setTodosLoading,
+  loading,
 }) => {
   const activeTodos = todos.filter(item => item.completed);
   const activeCount = todos.length - activeTodos.length || 0;
@@ -42,19 +45,19 @@ const footerComponent: React.FC<Props> = ({
 
   const onError = () => {
     setErrorMessage(ERROR.delete);
-    setTodosLoading(null);
+    loading.removeIdFromLoadingList(null);
   };
 
-  const deleteAllCompleted = async () => {
-    await activeTodos.forEach(async item => {
-      setTodosLoading(item.id);
+  const deleteAllCompleted = () => {
+    activeTodos.forEach(async item => {
+      loading.adIdToLoadingList(item.id);
       try {
         await deleteTodo(item.id);
         setTodos(prev => prev.filter(todo => todo.id !== item.id));
       } catch (error) {
         onError();
       } finally {
-        setTodosLoading(null);
+        loading.removeIdFromLoadingList(item.id);
       }
     });
 
@@ -103,7 +106,10 @@ const footerComponent: React.FC<Props> = ({
 };
 
 const areLoaded = (prevProps: Props, nextProps: Props) => {
-  return prevProps.todos !== nextProps.todos && nextProps.todosLoading !== null;
+  const todosChanged = prevProps.todos !== nextProps.todos;
+  const todosLoadingEmpty = nextProps.todosLoading.length === 0;
+
+  return todosChanged && !todosLoadingEmpty;
 };
 
 export const Footer = React.memo(footerComponent, areLoaded);

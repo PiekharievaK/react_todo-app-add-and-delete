@@ -8,25 +8,28 @@ import { ERROR } from '../../types/enums';
 
 type Props = {
   todo: Todo;
-  setTodosLoading: (id: number | null) => void;
+  loading: {
+    adIdToLoadingList: (id: number) => void;
+    removeIdFromLoadingList: (id: number) => void;
+  };
   onError: (message: ERROR) => void;
   setTodos: (callback: (prev: Todo[]) => Todo[]) => void;
-  isLoading: number | null;
+  isLoading: number[];
 };
 
 export const TodoItem: React.FC<Props> = ({
   todo,
-  setTodosLoading,
+  loading: loadingList,
   onError,
   setTodos,
   isLoading,
 }) => {
-  const loading = todo.id === isLoading;
+  const loading = isLoading.includes(todo.id);
   // const [edit, setEdit] = useState(false);
 
   const deleteItem = async (id: number) => {
-    setTodosLoading(id);
     try {
+      loadingList.adIdToLoadingList(id);
       const resp = await deleteTodo(id);
 
       setTodos(prev => prev.filter(item => todo.id !== item.id));
@@ -37,12 +40,12 @@ export const TodoItem: React.FC<Props> = ({
     } catch (error) {
       onError(ERROR.delete);
     } finally {
-      setTodosLoading(null);
+      loadingList.removeIdFromLoadingList(id);
     }
   };
 
   const changeStatus = async (id: Todo['id'], status: Todo['completed']) => {
-    setTodosLoading(id);
+    loadingList.adIdToLoadingList(id);
     try {
       const resp = await changeTodoStatus(id, status);
 
@@ -62,7 +65,7 @@ export const TodoItem: React.FC<Props> = ({
     } catch (error) {
       onError(ERROR.update);
     } finally {
-      setTodosLoading(null);
+      loadingList.removeIdFromLoadingList(id);
     }
   };
 
