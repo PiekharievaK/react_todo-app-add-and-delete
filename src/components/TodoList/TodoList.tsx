@@ -20,7 +20,7 @@ export const TodoList: React.FC<Props> = ({
 }) => {
   // console.log('render list');
 
-  const onError = (message) => {
+  const onError = (message: ERROR) => {
     setErrorMessage(message);
     setTodosLoading(null);
     throw new Error(message);

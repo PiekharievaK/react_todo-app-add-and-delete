@@ -43,10 +43,6 @@ export const TodoItem: React.FC<Props> = ({
 
   const changeStatus = async (id: Todo['id'], status: Todo['completed']) => {
     setTodosLoading(id);
-    await changeTodoStatus(id, status);
-
-    setTodosLoading(null);
-    setTodosLoading(id);
     try {
       const resp = await changeTodoStatus(id, status);
 
