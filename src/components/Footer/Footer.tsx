@@ -46,25 +46,19 @@ const footerComponent: React.FC<Props> = ({
   };
 
   const deleteAllCompleted = async () => {
-    try {
-      setTodosLoading(0);
-      const resp = await Promise.all(
-        activeTodos.map(async item => {
-          await deleteTodo(item.id);
-          setTodos(prev => prev.filter(todo => todo.id !== item.id));
-        }),
-      );
-
-      setTodos(prev => prev.filter(item => !item.completed));
-
-      if (resp.some(result => !result)) {
-        throw new Error(ERROR.delete);
+    await activeTodos.forEach(async item => {
+      setTodosLoading(item.id);
+      try {
+        await deleteTodo(item.id);
+        setTodos(prev => prev.filter(todo => todo.id !== item.id));
+      } catch (error) {
+        onError();
+      } finally {
+        setTodosLoading(null);
       }
-    } catch (error) {
-      onError();
-    } finally {
-      setTodosLoading(null);
-    }
+    });
+
+    // setTodos(prev => prev.filter(item => !item.completed));
   };
 
   return (

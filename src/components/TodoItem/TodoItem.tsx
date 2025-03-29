@@ -9,7 +9,7 @@ import { ERROR } from '../../types/enums';
 type Props = {
   todo: Todo;
   setTodosLoading: (id: number | null) => void;
-  onError: () => void;
+  onError: (message: ERROR) => void;
   setTodos: (callback: (prev: Todo[]) => Todo[]) => void;
   isLoading: number | null;
 };
@@ -35,7 +35,7 @@ export const TodoItem: React.FC<Props> = ({
         throw new Error(ERROR.delete);
       }
     } catch (error) {
-      onError();
+      onError(ERROR.delete);
     } finally {
       setTodosLoading(null);
     }
@@ -46,6 +46,28 @@ export const TodoItem: React.FC<Props> = ({
     await changeTodoStatus(id, status);
 
     setTodosLoading(null);
+    setTodosLoading(id);
+    try {
+      const resp = await changeTodoStatus(id, status);
+
+      setTodos(prev =>
+        prev.map(item => {
+          if (todo.id === item.id) {
+            return { ...item, completed: status };
+          }
+
+          return item;
+        }),
+      );
+      if (!resp) {
+        setTodos(prev => [...prev, todo]);
+        throw new Error(ERROR.update);
+      }
+    } catch (error) {
+      onError(ERROR.update);
+    } finally {
+      setTodosLoading(null);
+    }
   };
 
   return (

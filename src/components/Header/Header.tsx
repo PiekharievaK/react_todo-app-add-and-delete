@@ -61,6 +61,16 @@ const HeaderComponent: React.FC<Props> = ({
 
           const res = await addTodo(todo);
 
+          setTodos(prev => {
+            return prev.map(item => {
+              if (item.id === id) {
+                return res as Todo;
+              }
+
+              return item;
+            });
+          });
+
           inputField.current.value = '';
           inputField.current.focus();
           setTodosLoading(id);
